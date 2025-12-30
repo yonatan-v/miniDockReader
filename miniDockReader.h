@@ -11,11 +11,11 @@
 // THIRD PARTY LICENSES:
 // thirdparty libraries used:
 // miniz-cpp:
-// * GitHub: https://github.com/tfussell/miniz-cpp
-// * License: MIT License
+//   GitHub: https://github.com/tfussell/miniz-cpp
+//   License: MIT License
 // tinyxml2:
-// * GitHub: https://github.com/leethomason/tinyxml2
-// * License: zlib License
+//   GitHub: https://github.com/leethomason/tinyxml2
+//   License: zlib License
 
 
 // ---------------- Description ----------------
@@ -68,11 +68,13 @@
 #endif
 
 // ---- Public API ----
+// Element type enum
 enum class ElementType {
     Paragraph,
     Run
 };
 
+// Justification enum
 enum class Justification {
     Left,
     Center,
@@ -80,6 +82,8 @@ enum class Justification {
     Justify
 };
 
+// Color structure
+// Represents RGBA color
 struct Color {
     uint8_t r = 0;
     uint8_t g = 0;
@@ -112,105 +116,131 @@ struct Color {
     }
 };
 
+// Tab stop structure
 struct Tab {
-    float position = 0.0f; // in points
-    char  alignment = 'L'; // L, C, R, D (decimal)
-    std::string leader; // e.g. dots
+    float position = 0.0f;              // in points
+    char  alignment = 'L';              // L, C, R, D (decimal)
+    std::string leader;                 // e.g. dots
 };
+
+// Style structure representing both paragraph and run styles
+// Used for merging styles
 struct Style {
-    ElementType styleType;     // paragraph or run
-    std::string basedOn;
-    bool        bold        = false;
-    bool        italic      = false;
-    bool        underline   = false;
-    bool        strikeThrough = false;
-    bool        Subscript     = false;
-    bool        Superscript   = false;
-    Color       color;
-    Color       backColor;
-    std::string fontFamily;
-    float       fontSize    = 0.0f;
+    ElementType styleType;              // paragraph or run
+    std::string basedOn;                // the style which this style based on
+    bool        bold        = false;    // the 'bold' style
+    bool        italic      = false;    // the 'italic' style
+    bool        underline   = false;    // the text has line under the text
+    bool        strikeThrough = false;  // the text has line through the text
+    bool        Subscript     = false;  // the text is subscript, e.g. for footnotes
+    bool        Superscript   = false;  // the text is superscript
+    Color       color;                  // the color of the text
+    Color       backColor;              // the background color of the text
+    std::string fontFamily;             // font family name (e.g. Arial)
+    float       fontSize    = 0.0f;     // font size in points
 
     // paragraph properties
     // numbering
-    int         level = 0;
-    bool        numbered = false;
-    std::string  numberFormat;  // e.g. decimal, upperRoman, lowerLetter
-    std::string  numberStyle;   // e.g. "1.", "(a)", etc.
+    int         level = 0;              // the numbering level
+    bool        numbered = false;       // is numbered paragraph
+    std::string  numberFormat;          // e.g. decimal, upperRoman, lowerLetter
+    std::string  numberStyle;           // e.g. "1.", "(a)", etc.
     // spacing
-    float       lineSpacing = 1.0f;
-    float       spaceBefore = 0.0f;
-    float       spaceAfter  = 0.0f;
-    bool        spaceBetweenSameStyle = false;
+    float       lineSpacing = 1.0f;     // line spacing multiplier
+    float       spaceBefore = 0.0f;     // space before the paragraph
+    float       spaceAfter  = 0.0f;     // space after the paragraph
+    bool        spaceBetweenSameStyle = false;  // special handling for same-style paragraphs
     // alignment
-    Justification justification = Justification::Left;
-    bool        rightDirection = false;
+    Justification justification = Justification::Left;  // paragraph alignment
+    bool        rightDirection = false; // is right-to-left direction
     // indentation
-    float       indentLeft = 0.0f;
-    float       indentRight = 0.0f;
-    float       indentFirstLine = 0.0f;
+    float       indentLeft = 0.0f;      // left indent in points
+    float       indentRight = 0.0f;     // right indent in points
+    float       indentFirstLine = 0.0f; // first line indent in points
     // tabs
-    std::vector<Tab> tabs;
+    std::vector<Tab> tabs;              // tab stops
 };
 
+// Paragraph structure
+// Represents a paragraph in the document
 struct Paragraph {
-    std::string style;  // style ID
+    std::string style;                  // style ID
 
     // numbering
-    int         level = 0;
-    bool        numbered = false;
-    std::string  numberFormat;  // e.g. decimal, upperRoman, lowerLetter
-    std::string  numberStyle;   // e.g. "1.", "(a)", etc.
+    int         level = 0;              // the numbering level
+    bool        numbered = false;       // is numbered paragraph
+    std::string numberFormat;           // e.g. decimal, upperRoman, lowerLetter
+    std::string numberStyle;            // e.g. "1.", "(a)", etc.
     // alignment
-    Justification justification = Justification::Left;
-    bool        rightDirection = false;
+    Justification justification = Justification::Left;  // paragraph alignment
+    bool        rightDirection = false; // is right-to-left direction
     // spacing
-    float            lineSpacing = 1.0f;
-    float            spaceBefore = 0.0f;
-    float            spaceAfter  = 0.0f;
-    bool             spaceBetweenSameStyle = false;
+    float       lineSpacing = 1.0f;     // line spacing multiplier
+    float       spaceBefore = 0.0f;     // space before the paragraph
+    float       spaceAfter  = 0.0f;     // space after the paragraph
+    bool        spaceBetweenSameStyle = false; // special handling for same-style paragraphs
     // indentation
-    float       indentLeft = 0.0f;
-    float       indentRight = 0.0f;
-    float       indentFirstLine = 0.0f;
+    float       indentLeft = 0.0f;      // left indent in points
+    float       indentRight = 0.0f;     // right indent in points
+    float       indentFirstLine = 0.0f; // first line indent in points
     // tabs
-    std::vector<Tab> tabs;
+    std::vector<Tab> tabs;              // tab stops
 
     // runs
-    std::vector<Run> runs;
+    std::vector<Run> runs;              // vector of runs in the paragraph
 };
 
+// Run structure
+// Represents a text run in a paragraph
 struct Run {
-    std::string text;
-    std::string lang;
-    std::string style;  // style ID
-    bool        bold        = false;
-    bool        italic      = false;
-    bool        underline   = false;
-    bool        strike      = false;
-    bool        Subscript   = false;
-    bool        Superscript = false;
-    Color       color;
-    Color       backColor;
-    std::string fontFamily;
-    float       fontSize    = 0.0f; // points
+    std::string text;                   // run text
+    std::string lang;                   // style properties
+    std::string style;                  // style ID
+    bool        bold        = false;    // the 'bold' style
+    bool        italic      = false;    // the 'italic' style
+    bool        underline   = false;    // the text has line under the text
+    bool        strike      = false;    // the text has line through the text
+    bool        subscript   = false;    // the text is subscript, e.g. for footnotes
+    bool        superscript = false;    // the text is superscript
+    Color       color;                  // the color of the text
+    Color       backColor;              // the background color of the text     
+    std::string fontFamily;             // font family name (e.g. Arial)
+    float       fontSize    = 0.0f;     // font size in points
+
+    // for Notes:
+    uint32_t    noteId      = 0;        // the footnote / endnote ID
+};
+
+// Note structure
+// Represents a footnote or endnote
+struct Note{
+    int         id;                     // footnote ID
+    std::vector<Paragraph> paragraphs;  // footnote text
+};
+
+// Document structure
+// Represents the entire document
+struct Document {
+    std::vector<Paragraph> paragraphs;  // vector of paragraphs in the document
+    std::unordered_map<std::string, Style> styles; // map of style ID to Style
+    std::unordered_map<int, Note> footnotes; // map of footnote ID to Note
+    std::unordered_map<int, Note> endnotes;  // map of endnote ID to Note
 };
 
 
-using StyleMap = std::unordered_map<std::string, Style>;
 
 // API function declarations
 
 // Reads a MiniDock document from a file path
 // @param path: path to the MiniDock (.docx) file
-// @return vector of Paragraphs
-MINIDOCKLIB_API std::vector<Paragraph> readDocument(
+// @return Document structure representing the document
+MINIDOCKLIB_API Document readDocument(
       const std::string& path);
 
 // Reads a MiniDock document from in-memory data
 // @param data: pointer to the in-memory data
 // @param size: size of the in-memory data
-// @return vector of Paragraphs
-MINIDOCKLIB_API std::vector<Paragraph> readDocumentFromMemory(
+// @return Document structure representing the document
+MINIDOCKLIB_API Document readDocumentFromMemory(
     const char* data,
     size_t      size);
